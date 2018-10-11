@@ -112,7 +112,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
 #ifdef OPENCV
     args.threads = 3 * ngpus;
     IplImage* img = NULL;
-    float max_img_loss = 5;
+    float max_img_loss = 1.0;
     int number_of_lines = 100;
     int img_size = 1000;
     if (!dont_show)

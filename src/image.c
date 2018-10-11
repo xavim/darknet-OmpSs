@@ -1886,6 +1886,22 @@ image get_image_layer(image m, int l)
     return out;
 }
 
+image array_to_image(int* src_data, int h , int w, int c)
+{
+    image im = make_image(w, h, c);
+    unsigned char *data = (unsigned char *)src_data;
+    int i, j, k;
+
+   for(i = 0; i < h; ++i){
+        for(k= 0; k < c; ++k){
+            for(j = 0; j < w; ++j){
+                im.data[k*w*h + i*w + j] = data[j*c + (c-1 - k) + i*w*c]/255.;
+            }
+        }
+    }
+    return im;
+}
+
 void print_image(image m)
 {
     int i, j, k;

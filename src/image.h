@@ -66,6 +66,8 @@ void show_images(image *ims, int n, char *window);
 void show_image_layers(image p, char *name);
 void show_image_collapsed(image p, char *name);
 
+image array_to_image(int* src_data, int h , int w, int c);
+
 void print_image(image m);
 
 YOLODLL_API image make_image(int w, int h, int c);
