@@ -21,7 +21,7 @@ void train_writing(char *cfgfile, char *weightfile)
     int imgs = net.batch*net.subdivisions;
     list *plist = get_paths("figures.list");
     char **paths = (char **)list_to_array(plist);
-    clock_t time;
+    clock_t itwastime;
     int N = plist->size;
     printf("N: %d\n", N);
     image out = get_network_image(net);
@@ -42,13 +42,13 @@ void train_writing(char *cfgfile, char *weightfile)
     pthread_t load_thread = load_data_in_thread(args);
     int epoch = (*net.seen)/N;
     while(get_current_batch(net) < net.max_batches || net.max_batches == 0){
-        time=clock();
+        itwastime=clock();
         pthread_join(load_thread, 0);
         train = buffer;
         load_thread = load_data_in_thread(args);
-        printf("Loaded %lf seconds\n",sec(clock()-time));
+        printf("Loaded %lf seconds\n",sec(clock()-itwastime));
 
-        time=clock();
+        itwastime=clock();
         float loss = train_network(net, train);
 
         /*
@@ -69,7 +69,7 @@ void train_writing(char *cfgfile, char *weightfile)
 
         if(avg_loss == -1) avg_loss = loss;
         avg_loss = avg_loss*.9 + loss*.1;
-        printf("%d, %.3f: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), (float)(*net.seen)/N, loss, avg_loss, get_current_rate(net), sec(clock()-time), *net.seen);
+        printf("%d, %.3f: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), (float)(*net.seen)/N, loss, avg_loss, get_current_rate(net), sec(clock()-itwastime), *net.seen);
         free_data(train);
         if(get_current_batch(net)%100 == 0){
             char buff[256];

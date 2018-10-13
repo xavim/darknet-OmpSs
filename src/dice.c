@@ -22,18 +22,18 @@ void train_dice(char *cfgfile, char *weightfile)
     list *plist = get_paths("data/dice/dice.train.list");
     char **paths = (char **)list_to_array(plist);
     printf("%d\n", plist->size);
-    clock_t time;
+    clock_t itwastime;
     while(1){
         ++i;
-        time=clock();
+        itwastime=clock();
         data train = load_data_old(paths, imgs, plist->size, labels, 6, net.w, net.h);
-        printf("Loaded: %lf seconds\n", sec(clock()-time));
+        printf("Loaded: %lf seconds\n", sec(clock()-itwastime));
 
-        time=clock();
+        itwastime=clock();
         float loss = train_network(net, train);
         if(avg_loss == -1) avg_loss = loss;
         avg_loss = avg_loss*.9 + loss*.1;
-        printf("%d: %f, %f avg, %lf seconds, %d images\n", i, loss, avg_loss, sec(clock()-time), *net.seen);
+        printf("%d: %f, %f avg, %lf seconds, %d images\n", i, loss, avg_loss, sec(clock()-itwastime), *net.seen);
         free_data(train);
         if((i % 100) == 0) net.learning_rate *= .1;
         if(i%100==0){

@@ -28,12 +28,12 @@ void train_cifar(char *cfgfile, char *weightfile)
     int epoch = (*net.seen)/N;
     data train = load_all_cifar10();
     while(get_current_batch(net) < net.max_batches || net.max_batches == 0){
-        clock_t time=clock();
+        clock_t itwastime=clock();
 
         float loss = train_network_sgd(net, train, 1);
         if(avg_loss == -1) avg_loss = loss;
         avg_loss = avg_loss*.95 + loss*.05;
-        printf("%d, %.3f: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), (float)(*net.seen)/N, loss, avg_loss, get_current_rate(net), sec(clock()-time), *net.seen);
+        printf("%d, %.3f: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), (float)(*net.seen)/N, loss, avg_loss, get_current_rate(net), sec(clock()-itwastime), *net.seen);
         if(*net.seen/N > epoch){
             epoch = *net.seen/N;
             char buff[256];
@@ -84,12 +84,12 @@ void train_cifar_distill(char *cfgfile, char *weightfile)
     matrix_add_matrix(soft, train.y);
 
     while(get_current_batch(net) < net.max_batches || net.max_batches == 0){
-        clock_t time=clock();
+        clock_t itwastime=clock();
 
         float loss = train_network_sgd(net, train, 1);
         if(avg_loss == -1) avg_loss = loss;
         avg_loss = avg_loss*.95 + loss*.05;
-        printf("%d, %.3f: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), (float)(*net.seen)/N, loss, avg_loss, get_current_rate(net), sec(clock()-time), *net.seen);
+        printf("%d, %.3f: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), (float)(*net.seen)/N, loss, avg_loss, get_current_rate(net), sec(clock()-itwastime), *net.seen);
         if(*net.seen/N > epoch){
             epoch = *net.seen/N;
             char buff[256];
@@ -152,17 +152,17 @@ void test_cifar(char *filename, char *weightfile)
     }
     srand(time(0));
 
-    clock_t time;
+    clock_t itwastime;
     float avg_acc = 0;
     float avg_top5 = 0;
     data test = load_cifar10_data("data/cifar/cifar-10-batches-bin/test_batch.bin");
 
-    time=clock();
+    itwastime=clock();
 
     float *acc = network_accuracies(net, test, 2);
     avg_acc += acc[0];
     avg_top5 += acc[1];
-    printf("top1: %f, %lf seconds, %d images\n", avg_acc, sec(clock()-time), test.X.rows);
+    printf("top1: %f, %lf seconds, %d images\n", avg_acc, sec(clock()-itwastime), test.X.rows);
     free_data(test);
 }
 

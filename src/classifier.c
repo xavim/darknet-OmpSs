@@ -83,7 +83,7 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
     char **paths = (char **)list_to_array(plist);
     printf("%d\n", plist->size);
     int N = plist->size;
-    clock_t time;
+    clock_t itwastime;
 
     load_args args = {0};
     args.w = net.w;
@@ -126,14 +126,14 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
 
     int iter_save = get_current_batch(net);
     while(get_current_batch(net) < net.max_batches || net.max_batches == 0){
-        time=clock();
+        itwastime=clock();
 
         pthread_join(load_thread, 0);
         train = buffer;
         load_thread = load_data(args);
 
-        printf("Loaded: %lf seconds\n", sec(clock()-time));
-        time=clock();
+        printf("Loaded: %lf seconds\n", sec(clock()-itwastime));
+        itwastime=clock();
 
         float loss = 0;
 #ifdef GPU
@@ -150,7 +150,7 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
 
         i = get_current_batch(net);
 
-        printf("%d, %.3f: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), (float)(*net.seen)/N, loss, avg_loss, get_current_rate(net), sec(clock()-time), *net.seen);
+        printf("%d, %.3f: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), (float)(*net.seen)/N, loss, avg_loss, get_current_rate(net), sec(clock()-itwastime), *net.seen);
 #ifdef OPENCV
         if(!dont_show)
             draw_train_loss(img, img_size, avg_loss, max_img_loss, i, net.max_batches);
@@ -322,7 +322,7 @@ void validate_classifier_crop(char *datacfg, char *filename, char *weightfile)
     int m = plist->size;
     free_list(plist);
 
-    clock_t time;
+    clock_t itwastime;
     float avg_acc = 0;
     float avg_topk = 0;
     int splits = m/1000;
@@ -344,7 +344,7 @@ void validate_classifier_crop(char *datacfg, char *filename, char *weightfile)
 
     pthread_t load_thread = load_data_in_thread(args);
     for(i = 1; i <= splits; ++i){
-        time=clock();
+        itwastime=clock();
 
         pthread_join(load_thread, 0);
         val = buffer;
@@ -355,13 +355,13 @@ void validate_classifier_crop(char *datacfg, char *filename, char *weightfile)
             args.paths = part;
             load_thread = load_data_in_thread(args);
         }
-        printf("Loaded: %d images in %lf seconds\n", val.X.rows, sec(clock()-time));
+        printf("Loaded: %d images in %lf seconds\n", val.X.rows, sec(clock()-itwastime));
 
-        time=clock();
+        itwastime=clock();
         float *acc = network_accuracies(net, val, topk);
         avg_acc += acc[0];
         avg_topk += acc[1];
-        printf("%d: top 1: %f, top %d: %f, %lf seconds, %d images\n", i, avg_acc/i, topk, avg_topk/i, sec(clock()-time), val.X.rows);
+        printf("%d: top 1: %f, top %d: %f, %lf seconds, %d images\n", i, avg_acc/i, topk, avg_topk/i, sec(clock()-itwastime), val.X.rows);
         free_data(val);
     }
 }
@@ -829,7 +829,7 @@ void test_classifier(char *datacfg, char *cfgfile, char *weightfile, int target_
     int m = plist->size;
     free_list(plist);
 
-    clock_t time;
+    clock_t itwastime;
 
     data val, buffer;
 
@@ -846,7 +846,7 @@ void test_classifier(char *datacfg, char *cfgfile, char *weightfile, int target_
 
     pthread_t load_thread = load_data_in_thread(args);
     for(curr = net.batch; curr < m; curr += net.batch){
-        time=clock();
+        itwastime=clock();
 
         pthread_join(load_thread, 0);
         val = buffer;
@@ -856,9 +856,9 @@ void test_classifier(char *datacfg, char *cfgfile, char *weightfile, int target_
             if (curr + net.batch > m) args.n = m - curr;
             load_thread = load_data_in_thread(args);
         }
-        fprintf(stderr, "Loaded: %d images in %lf seconds\n", val.X.rows, sec(clock()-time));
+        fprintf(stderr, "Loaded: %d images in %lf seconds\n", val.X.rows, sec(clock()-itwastime));
 
-        time=clock();
+        itwastime=clock();
         matrix pred = network_predict_data(net, val);
 
         int i, j;
@@ -876,7 +876,7 @@ void test_classifier(char *datacfg, char *cfgfile, char *weightfile, int target_
 
         free_matrix(pred);
 
-        fprintf(stderr, "%lf seconds, %d images, %d total\n", sec(clock()-time), val.X.rows, curr);
+        fprintf(stderr, "%lf seconds, %d images, %d total\n", sec(clock()-itwastime), val.X.rows, curr);
         free_data(val);
     }
 }

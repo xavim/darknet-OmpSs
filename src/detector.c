@@ -112,7 +112,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
 #ifdef OPENCV
     args.threads = 3 * ngpus;
     IplImage* img = NULL;
-    float max_img_loss = 1.0;
+    float max_img_loss = 5;
     int number_of_lines = 100;
     int img_size = 1000;
     if (!dont_show)
@@ -120,7 +120,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
 #endif    //OPENCV
 
     pthread_t load_thread = load_data(args);
-    double time;
+    double itwastime;
     int count = 0;
     //while(i*imgs < N*120){
     while(get_current_batch(net) < net.max_batches){
@@ -155,7 +155,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             }
             net = nets[0];
         }
-        time=what_time_is_it_now();
+        itwastime=what_time_is_it_now();
         pthread_join(load_thread, 0);
         train = buffer;
         load_thread = load_data(args);
@@ -177,9 +177,9 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
            save_image(im, "truth11");
          */
 
-        printf("Loaded: %lf seconds\n", (what_time_is_it_now()-time));
+        printf("Loaded: %lf seconds\n", (what_time_is_it_now()-itwastime));
 
-        time=what_time_is_it_now();
+        itwastime=what_time_is_it_now();
         float loss = 0;
 #ifdef GPU
         if(ngpus == 1){
@@ -194,7 +194,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         avg_loss = avg_loss*.9 + loss*.1;
 
         i = get_current_batch(net);
-        printf("\n %d: %f, %f avg loss, %f rate, %lf seconds, %d images\n", get_current_batch(net), loss, avg_loss, get_current_rate(net), (what_time_is_it_now()-time), i*imgs);
+        printf("\n %d: %f, %f avg loss, %f rate, %lf seconds, %d images\n", get_current_batch(net), loss, avg_loss, get_current_rate(net), (what_time_is_it_now()-itwastime), i*imgs);
 
 #ifdef OPENCV
         if(!dont_show)

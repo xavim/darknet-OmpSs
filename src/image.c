@@ -15,6 +15,7 @@
 #include "opencv2/imgproc/imgproc_c.h"
 #include "opencv2/core/types_c.h"
 #include "opencv2/core/version.hpp"
+#include "opencv2/core/fast_math.hpp"
 #ifndef CV_VERSION_EPOCH
 #include "opencv2/videoio/videoio_c.h"
 #include "opencv2/imgcodecs/imgcodecs_c.h"
@@ -1884,22 +1885,6 @@ image get_image_layer(image m, int l)
         out.data[i] = m.data[i+l*m.h*m.w];
     }
     return out;
-}
-
-image array_to_image(int* src_data, int h , int w, int c)
-{
-    image im = make_image(w, h, c);
-    unsigned char *data = (unsigned char *)src_data;
-    int i, j, k;
-
-   for(i = 0; i < h; ++i){
-        for(k= 0; k < c; ++k){
-            for(j = 0; j < w; ++j){
-                im.data[k*w*h + i*w + j] = data[j*c + (c-1 - k) + i*w*c]/255.;
-            }
-        }
-    }
-    return im;
 }
 
 void print_image(image m)
